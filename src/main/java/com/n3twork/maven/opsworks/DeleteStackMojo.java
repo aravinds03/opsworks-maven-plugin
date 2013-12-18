@@ -1,14 +1,12 @@
 package com.n3twork.maven.opsworks;
 
-import com.amazonaws.services.identitymanagement.model.*;
-import com.amazonaws.services.opsworks.model.CreateStackRequest;
+import com.amazonaws.services.opsworks.model.DeleteStackRequest;
 import com.amazonaws.services.opsworks.model.Stack;
 import com.amazonaws.services.opsworks.model.UpdateStackRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -18,13 +16,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Just enough for our current needs: manage custom JSON
+ * Just enough for our current needs
  */
-@Mojo(name = "update-stack", defaultPhase = LifecyclePhase.DEPLOY)
-public class UpdateStackMojo extends OpsworksMojo {
-
-    @Parameter(property = "customJsonOverride", required = false)
-    private String customJsonOverride;
+@Mojo(name = "delete-stack", defaultPhase = LifecyclePhase.DEPLOY)
+public class DeleteStackMojo extends OpsworksMojo {
 
     public void run() throws IOException {
         List<Stack> stacks = opsworksUtil.getStacksByName(stackName);
@@ -33,27 +28,9 @@ public class UpdateStackMojo extends OpsworksMojo {
         }
 
         for (Stack stack : stacks) {
-            UpdateStackRequest request = new UpdateStackRequest();
+            DeleteStackRequest request = new DeleteStackRequest();
             request.setStackId(stack.getStackId());
-
-            if (customJsonOverride != null) {
-                String newJson;
-
-                ObjectMapper json = new ObjectMapper();
-                json.enable(SerializationFeature.INDENT_OUTPUT);
-
-                String oldJson = stack.getCustomJson();
-                if (oldJson == null || oldJson.length() == 0) {
-                    newJson = customJsonOverride;
-                } else {
-                    JsonNode overrideNode = json.readTree(customJsonOverride);
-                    JsonNode currentNode = json.readTree(oldJson);
-                    JsonNode merged = merge(currentNode, overrideNode);
-                    newJson = json.writeValueAsString(merged);
-                }
-                request.setCustomJson(newJson);
-            }
-            opsworks.updateStack(request);
+            opsworks.deleteStack(request);
         }
     }
 

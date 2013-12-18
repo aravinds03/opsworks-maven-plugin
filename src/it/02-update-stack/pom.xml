@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.n3twork.it</groupId>
-    <artifactId>simple-it</artifactId>
+    <artifactId>create-stack</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <description>A simple IT verifying the basic use case.</description>
+    <description>A simple test of the update-stack goal</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,35 +21,12 @@
                 <version>@project.version@</version>
                 <configuration>
                     <stackName>test-@project.artifactId@</stackName>
-                    <region>us-east-1</region>
-                    <customJson>
-                        { "root": {
-                            "key": "oldValue"
-                          }
-                        }
-                    </customJson>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>create</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>create-stack</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>@project.groupId@</groupId>
-                <artifactId>@project.artifactId@</artifactId>
-                <version>@project.version@</version>
-                <configuration>
-                    <stackName>test-@project.artifactId@</stackName>
                     <customJsonOverride>
                         { "root": {
-                            "key": "newValue"
+                            "key": "newValue",
+                            "key2": "value"
                           },
-                          "other": 259
+                          "otherKey": "otherValue"
                         }
                     </customJsonOverride>
                 </configuration>
