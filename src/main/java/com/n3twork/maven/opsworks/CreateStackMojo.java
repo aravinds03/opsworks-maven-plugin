@@ -8,6 +8,8 @@ import com.amazonaws.services.identitymanagement.model.*;
 import com.amazonaws.services.opsworks.AWSOpsWorks;
 import com.amazonaws.services.opsworks.AWSOpsWorksClient;
 import com.amazonaws.services.opsworks.model.CreateStackRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -18,19 +20,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 
+import java.io.IOException;
+
 /**
  * Minimal implementation, just enough to test other goals
  */
 @Mojo(name = "create-stack", defaultPhase = LifecyclePhase.DEPLOY)
-public class CreateStackMojo extends AbstractMojo {
-    private Log log = getLog();
+public class CreateStackMojo extends OpsworksMojo {
 
-
-    @Parameter(defaultValue = "aws.amazon.com", property = "serverId", required = true)
-    private String serverId;
-
-    @Parameter(property = "stackName", required = true)
-    private String stackName;
 
     @Parameter(defaultValue = "aws-opsworks-service-role", property = "serviceRole", required = true)
     private String serviceRole;
@@ -41,38 +38,24 @@ public class CreateStackMojo extends AbstractMojo {
     @Parameter(defaultValue = "aws-opsworks-ec2-role", property = "instanceProfile", required = true)
     private String instanceProfile;
 
-    @Component
-    private Settings settings;
+    @Parameter(property = "customJson", required = false)
+    private String customJson;
 
-    private AWSOpsWorks opsworks;
-    private AmazonIdentityManagement iam;
+    public void run() throws IOException {
+        CreateStackRequest request = new CreateStackRequest();
+        request.setName(stackName);
+        request.setRegion(region);
+        request.setDefaultInstanceProfileArn(getInstanceProfileArn(instanceProfile));
+        request.setServiceRoleArn(getRoleArn(serviceRole));
 
-    public void execute()
-            throws MojoExecutionException {
-        try {
-            init();
-
-            CreateStackRequest request = new CreateStackRequest();
-            request.setName(stackName);
-            request.setRegion(region);
-            request.setDefaultInstanceProfileArn(getInstanceProfileArn(instanceProfile));
-            request.setServiceRoleArn(getRoleArn(serviceRole));
-            opsworks.createStack(request);
-        } finally {
-            try {
-                cleanup();
-            }
-            catch (Exception ignored) {}
+        // Parse and pretty-print JSON
+        if (customJson != null) {
+            ObjectMapper json = new ObjectMapper();
+            json.enable(SerializationFeature.INDENT_OUTPUT);
+            customJson = json.writeValueAsString(json.readTree(customJson));
         }
-    }
-
-    private void cleanup() {
-        if (opsworks != null) {
-            opsworks.shutdown();
-        }
-        if (iam != null) {
-            iam.shutdown();
-        }
+        request.setCustomJson(customJson);
+        opsworks.createStack(request);
     }
 
     private String getInstanceProfileArn(String profileName) {
@@ -80,8 +63,7 @@ public class CreateStackMojo extends AbstractMojo {
         InstanceProfile profile = result.getInstanceProfile();
         if (profile == null) {
             throw new IllegalArgumentException("Unknown instance profile: " + profileName);
-        }
-        else {
+        } else {
             log.debug("Found arn for instance profile '" + profileName + "': " + profile.getArn());
         }
         return profile.getArn();
@@ -92,20 +74,10 @@ public class CreateStackMojo extends AbstractMojo {
         Role role = result.getRole();
         if (role == null) {
             throw new IllegalArgumentException("Unknown role: " + roleName);
-        }
-        else {
+        } else {
             log.debug("Found arn for role '" + roleName + "': " + role.getArn());
         }
         return role.getArn();
     }
 
-    private void init() {
-        Server server = settings.getServer(serverId);
-        if (server == null) {
-            throw new IllegalArgumentException("Unknown server '" + serverId + "'; is it in your settings.xml file?");
-        }
-        AWSCredentials credentials = new BasicAWSCredentials(server.getUsername(), server.getPassword());
-        opsworks = new AWSOpsWorksClient(credentials);
-        iam = new AmazonIdentityManagementClient(credentials);
-    }
 }
