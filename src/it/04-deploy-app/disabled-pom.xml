@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.n3twork.it</groupId>
-    <artifactId>update-stack</artifactId>
+    <artifactId>deploy-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <description>A simple test of the update-stack goal</description>
+    <description>A simple test of the deploy-app goal</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,21 +21,20 @@
                 <version>@project.version@</version>
                 <configuration>
                     <stackName>test-@project.artifactId@</stackName>
+                    <appName>test-app</appName>
                     <customJsonOverride>
                         { "root": {
-                            "key": "newValue",
-                            "key2": "value"
-                          },
-                          "otherKey": "otherValue"
+                            "key": "deployedValue"
+                          }
                         }
                     </customJsonOverride>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>update</id>
+                        <id>deploy-app</id>
                         <phase>validate</phase>
                         <goals>
-                            <goal>update-stack</goal>
+                            <goal>deploy-app</goal>
                         </goals>
                     </execution>
                 </executions>

@@ -21,13 +21,14 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Minimal implementation, just enough to test other goals
  */
 @Mojo(name = "create-stack", defaultPhase = LifecyclePhase.DEPLOY)
 public class CreateStackMojo extends OpsworksMojo {
-
+    private static Properties DEFAULTS = new Properties();
 
     @Parameter(defaultValue = "aws-opsworks-service-role", property = "serviceRole", required = true)
     private String serviceRole;
