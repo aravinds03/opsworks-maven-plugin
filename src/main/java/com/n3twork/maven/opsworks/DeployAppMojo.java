@@ -2,6 +2,7 @@ package com.n3twork.maven.opsworks;
 
 import com.amazonaws.services.identitymanagement.model.*;
 import com.amazonaws.services.opsworks.model.*;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -19,6 +20,9 @@ public class DeployAppMojo extends OpsworksMojo {
 
     @Parameter(property = "appName", required = true)
     private String appName;
+
+    @Parameter(defaultValue = "Deploy", property = "command", required = true)
+    private String command;
 
     @Parameter(property = "customJsonOverride", required = false)
     private String customJsonOverride;
@@ -39,7 +43,12 @@ public class DeployAppMojo extends OpsworksMojo {
                     opsworks.describeInstances(new DescribeInstancesRequest().withStackId(stack.getStackId())).getInstances();
             List<String> instanceIds = new ArrayList<String>(instances.size());
             for (Instance instance : instances) {
-                instanceIds.add(instance.getInstanceId());
+                if (instance.getStatus().equals("online"))
+                    instanceIds.add(instance.getInstanceId());
+            }
+
+            if (instanceIds.isEmpty()) {
+                throw new IllegalStateException("No online instances found");
             }
 
             for (App app : apps) {
@@ -47,6 +56,7 @@ public class DeployAppMojo extends OpsworksMojo {
                 request.setStackId(stack.getStackId());
                 request.setAppId(app.getAppId());
                 request.setCustomJson(customJsonOverride);
+                request.setCommand(new DeploymentCommand().withName(command));
 
                 if (instanceIds.size() > 0) {
                     request.setInstanceIds(instanceIds);
