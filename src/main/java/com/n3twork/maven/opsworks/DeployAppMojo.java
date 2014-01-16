@@ -21,7 +21,7 @@ public class DeployAppMojo extends OpsworksMojo {
     @Parameter(property = "appName", required = true)
     private String appName;
 
-    @Parameter(defaultValue = "Deploy", property = "command", required = true)
+    @Parameter(defaultValue = "deploy", property = "command", required = true)
     private String command;
 
     @Parameter(property = "customJsonOverride", required = false)
