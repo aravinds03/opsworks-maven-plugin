@@ -6,14 +6,30 @@
     <version>0.0.2-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
-    <name>Opsworks Maven Plugin</name>
-
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>A Maven plugin for deploying versioned applications to AWS OpsWorks</description>
     <url>http://github.com/N3TWORK/opsworks-maven-plugin</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Yuval Oren</name>
+            <email>yuval@n3twork.com</email>
+            <organization>N3TWORK</organization>
+            <organizationUrl>http://www.n3twork.com</organizationUrl>
+        </developer>
+    </developers>
 
     <scm>
         <connection>scm:git:git@github.com:N3TWORK/opsworks-maven-plugin.git</connection>
-        <url>scm:git:git@github.com:N3TWORK/opsworks-maven-plugin.git</url>
         <developerConnection>scm:git:git@github.com:N3TWORK/opsworks-maven-plugin.git</developerConnection>
+        <url>scm:git:git@github.com:N3TWORK/opsworks-maven-plugin.git</url>
     </scm>
 
     <properties>
@@ -75,6 +91,19 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.2</version>
                 <configuration>
@@ -127,6 +156,32 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
         <extensions>
@@ -140,18 +195,14 @@
     </build>
 
     <distributionManagement>
-        <site>
-            <id>nwanalytics.site</id>
-            <url>s3://nwanalytics-all/lib/site</url>
-        </site>
-        <repository>
-            <id>nwanalytics.release</id>
-            <url>s3://nwanalytics-all/lib/release</url>
-        </repository>
         <snapshotRepository>
-            <id>nwanalytics.snapshot</id>
-            <url>s3://nwanalytics-all/lib/snapshot</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
 </project>
