@@ -18,10 +18,10 @@
     </licenses>
 
     <scm>
-        <url>git@github.com:aravinds03/opsworks-maven-plugin.git</url>
-        <developerConnection>scm:git:git@github.com:aravinds03/opsworks-maven-plugin.git</developerConnection>
-        <connection>scm:git:git@github.com:aravinds03/opsworks-maven-plugin.git</connection>
-    </scm>
+		<url>https://github.com/aravinds03/opsworks-maven-plugin.git</url>
+		<connection>scm:git:https://github.com/aravinds03/opsworks-maven-plugin.git</connection>
+		<developerConnection>scm:git:https://github.com/aravinds03/opsworks-maven-plugin.git</developerConnection>
+	</scm>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
