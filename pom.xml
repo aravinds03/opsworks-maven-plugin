@@ -3,12 +3,12 @@
 
     <groupId>com.n3twork</groupId>
     <artifactId>opsworks-maven-plugin</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>A Maven plugin for deploying versioned applications to AWS OpsWorks</description>
-    <url>http://github.com/N3TWORK/opsworks-maven-plugin</url>
+    <url>http://github.com/aravinds03/opsworks-maven-plugin</url>
 
     <licenses>
         <license>
@@ -17,23 +17,15 @@
         </license>
     </licenses>
 
-    <developers>
-        <developer>
-            <name>Yuval Oren</name>
-            <email>yuval@n3twork.com</email>
-            <organization>N3TWORK</organization>
-            <organizationUrl>http://www.n3twork.com</organizationUrl>
-        </developer>
-    </developers>
-
     <scm>
-        <connection>scm:git:git@github.com:N3TWORK/opsworks-maven-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:N3TWORK/opsworks-maven-plugin.git</developerConnection>
-        <url>scm:git:git@github.com:N3TWORK/opsworks-maven-plugin.git</url>
+        <url>git@github.com:aravinds03/opsworks-maven-plugin.git</url>
+        <developerConnection>scm:git:git@github.com:aravinds03/opsworks-maven-plugin.git</developerConnection>
+        <connection>scm:git:git@github.com:aravinds03/opsworks-maven-plugin.git</connection>
     </scm>
-
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.scm.id>github.com</project.scm.id>
     </properties>
 
     <dependencies>
@@ -91,17 +83,10 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.7</version>
             </plugin>
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
@@ -150,7 +135,7 @@
                         <id>integration-test</id>
                         <goals>
                             <goal>install</goal>
-                            <goal>integration-test</goal>
+                  
                             <goal>verify</goal>
                         </goals>
                     </execution>
@@ -184,25 +169,24 @@
             </plugin>
         </plugins>
 
-        <extensions>
-            <extension>
-                <groupId>org.kuali.maven.wagons</groupId>
-                <artifactId>maven-s3-wagon</artifactId>
-                <version>1.1.22</version>
-            </extension>
-        </extensions>
-
     </build>
 
+    <repositories> 
+	    <repository>
+			<id>googlecode.oauth.releases.repo</id>
+			<url>dav:https://oauth-app1.googlecode.com/svn/trunk/mavenrepo/maven-releases/</url>
+		</repository>
+	</repositories>
+	
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
+			<id>googlecode.oauth.missing.repo</id>
+			<url>dav:https://oauth-app1.googlecode.com/svn/trunk/mavenrepo/maven-missing/</url>
+		</repository>
+		<snapshotRepository>
+			<id>googlecode.oauth.snapshot.repo</id>
+			<url>dav:https://oauth-app1.googlecode.com/svn/trunk/mavenrepo/maven-snapshots/</url>
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
     </distributionManagement>
-
 </project>

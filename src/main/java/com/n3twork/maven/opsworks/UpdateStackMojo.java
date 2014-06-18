@@ -1,21 +1,19 @@
 package com.n3twork.maven.opsworks;
 
-import com.amazonaws.services.identitymanagement.model.*;
-import com.amazonaws.services.opsworks.model.CreateStackRequest;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
 import com.amazonaws.services.opsworks.model.Stack;
 import com.amazonaws.services.opsworks.model.UpdateStackRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Just enough for our current needs: manage custom JSON
@@ -25,34 +23,36 @@ public class UpdateStackMojo extends OpsworksMojo {
 
     @Parameter(property = "customJsonOverride", required = false)
     private String customJsonOverride;
-
+	
     public void run() throws IOException {
         List<Stack> stacks = opsworksUtil.getStacksByName(stackName);
         if (stacks.isEmpty()) {
             throw new IllegalArgumentException("No stack found with name '" + stackName + "'");
         }
 
+        if (customJsonOverride == null) {
+        	return;
+        }
+
         for (Stack stack : stacks) {
             UpdateStackRequest request = new UpdateStackRequest();
             request.setStackId(stack.getStackId());
 
-            if (customJsonOverride != null) {
-                String newJson;
+            String newJson;
 
-                ObjectMapper json = new ObjectMapper();
-                json.enable(SerializationFeature.INDENT_OUTPUT);
+            ObjectMapper json = new ObjectMapper();
+            json.enable(SerializationFeature.INDENT_OUTPUT);
 
-                String oldJson = stack.getCustomJson();
-                if (oldJson == null || oldJson.length() == 0) {
-                    newJson = customJsonOverride;
-                } else {
-                    JsonNode overrideNode = json.readTree(customJsonOverride);
-                    JsonNode currentNode = json.readTree(oldJson);
-                    JsonNode merged = merge(currentNode, overrideNode);
-                    newJson = json.writeValueAsString(merged);
-                }
-                request.setCustomJson(newJson);
+            String oldJson = stack.getCustomJson();
+            if (oldJson == null || oldJson.length() == 0) {
+                newJson = customJsonOverride;
+            } else {
+                JsonNode overrideNode = json.readTree(customJsonOverride);
+                JsonNode currentNode = json.readTree(oldJson);
+                JsonNode merged = merge(currentNode, overrideNode);
+                newJson = json.writeValueAsString(merged);
             }
+            request.setCustomJson(newJson);
             opsworks.updateStack(request);
         }
     }
