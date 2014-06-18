@@ -3,7 +3,7 @@
 
     <groupId>com.n3twork</groupId>
     <artifactId>opsworks-maven-plugin</artifactId>
-    <version>0.0.7</version>
+    <version>0.0.8-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
